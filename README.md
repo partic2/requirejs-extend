@@ -9,19 +9,19 @@ about requirejs: https://requirejs.org/
 resource provider:
 
 ```javascript
+
 requirejs.config({
-    requirejs.config({
-        resourceProvider:async (modName:string,url:string)=>{
-            if(modName='test/requirejs/resourceProvider'){
-                return `define(['require','exports'],function(require,exports){
-                    console.log('hello amd');
-                    exports.hello='amd'
-                })`;
-            }
-            return null;
+    resourceProvider:async (modName:string,url:string)=>{
+        if(modName='test/requirejs/resourceProvider'){
+            return `define(['require','exports'],function(require,exports){
+                console.log('hello amd');
+                exports.hello='amd'
+            })`;
         }
-    })
+        return null;
+    }
 })
+
 ```
 
 ## TODO:
