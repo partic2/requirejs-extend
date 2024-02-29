@@ -6,7 +6,7 @@ about requirejs: https://requirejs.org/
 
 ## feature:
 
-resource provider:
+1. Add resource provider, to custom url processor.
 
 ```javascript
 
@@ -17,12 +17,18 @@ requirejs.config({
                 console.log('hello amd');
                 exports.hello='amd'
             })`;
+        }else if(modName='test/requirejs/resourceProvider2'){
+            return define(['require','exports'],function(require,exports){
+                return {hello:'amd'}
+            });
         }
         return null;
     }
 })
 
 ```
+
+2. Remove commonjs convertor, to avoid unexpected performance effect.
 
 ## TODO:
 import hook

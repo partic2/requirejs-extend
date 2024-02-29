@@ -12,8 +12,6 @@ var requirejs, require, define;
     var req, s, head, baseElement, dataMain, src,
         interactiveScript, currentlyAddingScript, mainScript, subPath,
         version = '2.3.6',
-        commentRegExp = /\/\*[\s\S]*?\*\/|([^:"'=]|^)\/\/.*$/mg,
-        cjsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g,
         jsSuffixRegExp = /\.js$/,
         currDirRegExp = /^\.\//,
         op = Object.prototype,
@@ -1988,19 +1986,37 @@ var requirejs, require, define;
                                     e,
                                     [moduleName]));
                 }
+            } else {
+                context.onError(makeError('moduleNotFound',
+                    'moduleNotFound for ' +
+                        moduleName + ' at ' + url,
+                    'notfound',
+                    [moduleName]));
             }
-        }
+        } 
         if(typeof config.resourceProvider ==='function'){
             var resourceProvider=config.resourceProvider
             var getModuleScript=resourceProvider(moduleName,url)
             getModuleScript.then(function(script){
                 if(script===null){
                     return defaultRJsHandler();
-                }else{
-                    new Function('require','requirejs','define',script)(require,requirejs,define);
+                }else if(typeof script==='string'){
+                    new Function('require','define','requirejs',script)(require,define,requirejs);
                     //Account for anonymous modules
                     context.completeLoad(moduleName);
+                }else{
+                    script();
+                    context.completeLoad(moduleName);
                 }
+            }).catch(function(err){
+                if('requireType' in err){
+                    throw err;
+                }
+                context.onError(makeError('importscripts',
+                    'importScripts failed for ' +
+                        moduleName + ' at ' + url,
+                    'scripterror',
+                    [moduleName]));
             });
         }else{
             return defaultRJsHandler();
@@ -2092,29 +2108,6 @@ var requirejs, require, define;
             deps = null;
         }
 
-        //If no name, and callback is a function, then figure out if it a
-        //CommonJS thing with dependencies.
-        if (!deps && isFunction(callback)) {
-            deps = [];
-            //Remove comments from the callback string,
-            //look for require calls, and pull them into the dependencies,
-            //but only if there are function args.
-            if (callback.length) {
-                callback
-                    .toString()
-                    .replace(commentRegExp, commentReplace)
-                    .replace(cjsRequireRegExp, function (match, dep) {
-                        deps.push(dep);
-                    });
-
-                //May be a CommonJS thing even without require calls, but still
-                //could use exports, and module. Avoid doing exports and module
-                //work though if it just needs require.
-                //REQUIRES the function to expect the CommonJS variables in the
-                //order listed below.
-                deps = (callback.length === 1 ? ['require'] : ['require', 'exports', 'module']).concat(deps);
-            }
-        }
 
         //If in IE 6-8 and hit an anonymous define() call, do the interactive
         //work.
@@ -2159,4 +2152,5 @@ var requirejs, require, define;
 
     //Set up with config info.
     req(cfg);
+
 }(this, (typeof setTimeout === 'undefined' ? undefined : setTimeout)));
