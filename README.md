@@ -30,5 +30,7 @@ requirejs.config({
 
 2. Remove commonjs convertor, to avoid unexpected performance effect.
 
+3. Save IIFE call to make it easier and faster to be used in Web Worker (experiment)
+
 ## TODO:
 import hook

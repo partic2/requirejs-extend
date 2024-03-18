@@ -7,8 +7,8 @@
 /*jslint regexp: true, nomen: true, sloppy: true */
 /*global window, navigator, document, importScripts, setTimeout, opera */
 
-var requirejs, require, define;
-(function (global, setTimeout) {
+
+(function __iife_requirejs(global, setTimeout) {
     var req, s, head, baseElement, dataMain, src,
         interactiveScript, currentlyAddingScript, mainScript, subPath,
         version = '2.3.6',
@@ -172,13 +172,13 @@ var requirejs, require, define;
         return e;
     }
 
-    if (typeof define !== 'undefined') {
+    if (typeof global.define !== 'undefined') {
         //If a define is already in play via another AMD loader,
         //do not overwrite.
         return;
     }
 
-    if (typeof requirejs !== 'undefined') {
+    if (typeof global.requirejs !== 'undefined') {
         if (isFunction(requirejs)) {
             //Do not overwrite an existing requirejs instance.
             return;
@@ -1759,7 +1759,7 @@ var requirejs, require, define;
      * on a require that are not standardized), and to give a short
      * name for minification/local scope use.
      */
-    req = requirejs = function (deps, callback, errback, optional) {
+    req = global.requirejs = function (deps, callback, errback, optional) {
 
         //Find the right context, use default
         var context, config,
@@ -1791,7 +1791,6 @@ var requirejs, require, define;
         if (config) {
             context.configure(config);
         }
-
         return context.require(deps, callback, errback);
     };
 
@@ -1816,8 +1815,8 @@ var requirejs, require, define;
     /**
      * Export require as a global, but only if it does not already exist.
      */
-    if (!require) {
-        require = req;
+    if (!global.require) {
+        global.require = req;
     }
 
     req.version = version;
@@ -2149,6 +2148,9 @@ var requirejs, require, define;
         /*jslint evil: true */
         return eval(text);
     };
+
+    //used to get the code to initalize requirejs in other place.
+    req.iife=__iife_requirejs;
 
     //Set up with config info.
     req(cfg);
