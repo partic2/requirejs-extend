@@ -2013,8 +2013,8 @@
                 }
                 context.onError(makeError('importscripts',
                     'importScripts failed for ' +
-                        moduleName + ' at ' + url,
-                    'scripterror',
+                        moduleName + ' at ' + url + ' message:'+err.message,
+                    err,
                     [moduleName]));
             });
         }else{
